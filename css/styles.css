@@ -165,7 +165,7 @@ a{color:inherit}a:hover{color:#C83636}
 .ctrl{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
 .arrows{display:flex;gap:8px}
 .arr{display:grid;place-items:center;width:52px;height:52px;border:1px solid #151513;border-radius:50%;background:transparent;color:#151513;cursor:pointer;transition:background .25s,color .25s,transform .25s}
-.arr:hover{background:#151513;color:#F3F3F1}
+@media (hover:hover){.arr:hover{background:#151513;color:#F3F3F1}}
 .arr:active{transform:scale(.92)}
 .ticks{display:flex;gap:2px}
 .tick{display:flex;align-items:center;width:24px;height:44px;padding:0;border:0;background:none;cursor:pointer}

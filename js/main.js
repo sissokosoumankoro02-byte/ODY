@@ -71,12 +71,13 @@
     var s = state;
     var k = Math.min(1, Math.max(0.42, s.vw / 1320), s.pin ? Math.max(0.5, (s.vh - 300) / 640) : 1);
     hero.style.height = (s.pin ? s.vh : 900) + 'px';
-    rack.style.height = (s.pin ? s.vh + (N - 1) * 200 : 1000) + 'px';
+    // The rack is one screen tall: pieces move with the arrows, not with the page scroll
+    rack.style.height = (s.pin ? s.vh : 1000) + 'px';
     pinEl.style.height = (s.pin ? s.vh : 1000) + 'px';
     stage.style.height = Math.round(640 * k) + 'px';
     stageIn.style.transform = 'scale(' + k.toFixed(3) + ')';
     root.classList.toggle('pin', s.pin);
-    if (hint) hint.textContent = s.pin ? 'SCROLL TO BROWSE THE RACK' : 'HOVER — CLICK A PIECE';
+    if (hint) hint.textContent = 'USE THE ARROWS — CLICK A PIECE';
   }
   function measure() {
     state.vh = window.innerHeight || 900;
@@ -122,10 +123,6 @@
       var f = Math.max(0, Math.min(1, st / vh));
       heroIn.style.transform = 'scale(' + (1 - f * 0.12).toFixed(4) + ') translateY(' + (f * -40).toFixed(1) + 'px)';
       heroIn.style.opacity = String(1 - f * 0.7);
-    }
-    if (state.pin) {
-      var r = rack.getBoundingClientRect(), total = r.height - vh;
-      if (total > 0) target = Math.max(0, Math.min(1, -r.top / total)) * (N - 1);
     }
     var w = 0;
     for (var k = 0; k < waypointIds.length; k++) {
@@ -202,28 +199,24 @@
   function goTo(i) {
     i = Math.max(0, Math.min(N - 1, i));
     lastUser = Date.now();
-    if (state.pin) {
-      var r = rack.getBoundingClientRect(), total = r.height - (window.innerHeight || 900);
-      var top = (se.scrollTop || window.scrollY || 0) + r.top + total * (i / (N - 1)) + 2;
-      try { window.scrollTo({ top: top, behavior: 'smooth' }); } catch (err) { se.scrollTop = top; }
-    } else {
-      target = i;
-    }
+    target = i;
   }
   function openFromGrid(i) {
-    if (state.pin) { goTo(i); return; }
-    target = i; lastUser = Date.now();
+    goTo(i);
     rack.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   function next() { var c = Math.round(target); goTo(c >= N - 1 ? 0 : c + 1); }
   function prev() { var c = Math.round(target); goTo(c <= 0 ? N - 1 : c - 1); }
 
-  stage.addEventListener('mouseenter', function () { hover = true; });
-  stage.addEventListener('mouseleave', function () { hover = false; });
-  setInterval(function () {
-    if (state.pin || hover || Date.now() - lastUser < 5000) return;
-    target = (Math.round(target) + 1) % N;
-  }, 2800);
+  // Keyboard: left / right arrows browse the rack while it is on screen
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    var r = rack.getBoundingClientRect(), vh = window.innerHeight || 900;
+    if (r.top > vh * 0.5 || r.bottom < vh * 0.5) return;
+    e.preventDefault();
+    if (e.key === 'ArrowRight') next(); else prev();
+  });
 
   /* ---------- Cart (front-end only for now) ---------- */
   var cartBtn = $('.cart'), cartCount = $('[data-cart-count]'), addBtn = $('.add'), addLabel = addBtn ? addBtn.querySelector('span') : null, addT;
