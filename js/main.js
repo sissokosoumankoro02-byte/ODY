@@ -272,6 +272,31 @@
     form.hidden = true; thanks.hidden = false;
   });
 
+  /* ---------- Drop grid: play the hover effect on touch screens ----------
+     On phones there is no hover, so the scan / halftone / zoom effect plays
+     when a finger lands on a card, and when a card crosses the middle of
+     the screen while swiping through the shop. */
+  if (!hoverCapable) {
+    var fxTimers = new WeakMap();
+    var playFx = function (btn) {
+      if (btn.classList.contains('fx')) return;
+      void btn.offsetWidth; // restart the CSS animations
+      btn.classList.add('fx');
+      clearTimeout(fxTimers.get(btn));
+      fxTimers.set(btn, setTimeout(function () { btn.classList.remove('fx'); }, 1400));
+    };
+    var cardBtns = $$('.card-btn');
+    cardBtns.forEach(function (btn) {
+      btn.addEventListener('touchstart', function () { playFx(btn); }, { passive: true });
+    });
+    if ('IntersectionObserver' in window) {
+      var fxIo = new IntersectionObserver(function (es) {
+        es.forEach(function (en) { if (en.isIntersecting) playFx(en.target); });
+      }, { rootMargin: '-45% 0px -45% 0px' });
+      cardBtns.forEach(function (btn) { fxIo.observe(btn); });
+    }
+  }
+
   /* ---------- Scroll reveal ---------- */
   var rv = $$('[data-rv]');
   if ('IntersectionObserver' in window) {
