@@ -333,3 +333,8 @@ a{color:inherit}a:hover{color:#C83636}
 .ld.gone,.ld-line.gone{display:none}
 .thanks[hidden],.jform[hidden]{display:none}
 html{scroll-behavior:auto}
+/* Logo géant du footer : affiché en entier (plus rogné) */
+.giant-wrap{height:auto;padding:2vw 0 4vw}
+.giant{width:min(92%,1100px);transform:none}
+.giant-wrap:not(.in) .giant{transform:translateY(40%);opacity:0}
+.giant{transition:transform 1.6s cubic-bezier(.2,.8,.2,1),opacity 1s ease}
