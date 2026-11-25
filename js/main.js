@@ -66,10 +66,16 @@
   /* ---------- Layout measurement ---------- */
   var hero = $('.hero'), rack = document.getElementById('rack'), pinEl = $('.rack-pin');
   var stage = $('.stage'), stageIn = $('.stage-in'), hint = $('[data-hint]');
+  var rackHead = $('.rack-head'), rackInfo = $('.rack-info');
 
   function applyLayout() {
     var s = state;
-    var k = Math.min(1, Math.max(0.42, s.vw / 1320), s.pin ? Math.max(0.5, (s.vh - 300) / 640) : 1);
+    var k = Math.min(1, Math.max(0.42, s.vw / 1320), s.pin ? Math.max(0.5, (s.vh - 340) / 640) : 1);
+    // Phones: shrink the rack a bit if needed so the arrows, sizes and ADD TO CART always fit on screen
+    if (s.pin && s.vw <= 900 && rackHead && rackInfo) {
+      var free = s.vh - rackHead.offsetHeight - rackInfo.offsetHeight - 14;
+      k = Math.min(k, Math.max(0.3, free / 640));
+    }
     hero.style.height = (s.pin ? s.vh : 900) + 'px';
     // The rack is one screen tall: pieces move with the arrows, not with the page scroll
     rack.style.height = (s.pin ? s.vh : 1000) + 'px';
@@ -167,14 +173,15 @@
       if (Math.abs(ang[i]) > 0.01 || Math.abs(angV[i]) > 0.01) moving = true;
     }
     if (moving) {
-      var G = 78, S = 250;
+      // Side pieces: turned only 38° (was 72°) so you still see the garment's shape, not a thin edge
+      var G = 104, S = 236, ANG = 38;
       for (var j = 0; j < hangs.length; j++) {
         var d = j - p, cd = Math.max(-1, Math.min(1, d)), ad = Math.abs(d);
         var x = d * G + cd * S;
-        var sc = 1 - Math.min(ad, 1) * 0.1;
-        var br = 1 - Math.min(ad, 1) * 0.14 - Math.min(ad / 10, 0.22);
+        var sc = 1 - Math.min(ad, 1) * 0.2 - Math.min(Math.max(ad - 1, 0) * 0.03, 0.12);
+        var br = 1 - Math.min(ad, 1) * 0.12 - Math.min(ad / 10, 0.22);
         var el = hangs[j];
-        el.style.transform = 'translateX(' + x.toFixed(1) + 'px) translateX(-50%) rotateY(' + (cd * 72).toFixed(2) + 'deg) scale(' + sc.toFixed(3) + ')';
+        el.style.transform = 'translateX(' + x.toFixed(1) + 'px) translateX(-50%) rotateY(' + (cd * ANG).toFixed(2) + 'deg) scale(' + sc.toFixed(3) + ')';
         el.style.zIndex = String(200 - Math.round(ad * 10));
         el.style.filter = 'brightness(' + br.toFixed(3) + ')';
         el.style.opacity = ad > 7.5 ? String(Math.max(0, 1 - (ad - 7.5))) : '1';
