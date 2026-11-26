@@ -773,3 +773,13 @@ html{scroll-behavior:auto}
 .rv{grid-template-columns:64px minmax(0,1fr) auto;font-size:12px}
 .cardbox{grid-template-columns:minmax(0,1fr)}
 }
+
+/* ===== 10. Odyssey map: aerial photo of Vitry in the circle (your circles, sweep and point kept on top) ===== */
+.map{max-width:600px}
+.map-img{position:absolute;inset:0;background:url(../assets/img/vitry-map.webp) center/cover no-repeat;opacity:.6;filter:grayscale(1);-webkit-mask-image:radial-gradient(circle closest-side,#000 80%,transparent 100%);mask-image:radial-gradient(circle closest-side,#000 80%,transparent 100%);animation:mapDrift 40s ease-in-out infinite alternate}
+@keyframes mapDrift{from{transform:scale(1.02)}to{transform:scale(1.1) rotate(2deg)}}
+.map svg{position:relative}
+.m4{left:0;bottom:-24px;color:#6A6A6A}
+@media (max-width:900px){.map{max-width:420px}}
+@media (max-width:760px){.map{width:300px;max-width:300px}}
+@media (prefers-reduced-motion:reduce){.map-img{animation:none}}
