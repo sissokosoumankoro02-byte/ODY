@@ -236,7 +236,7 @@
   // Click on a piece: the one in front opens its product page, another one comes to the front
   function pick(i, fromGarment) {
     if (Date.now() - swiped < 350) return;
-    if (fromGarment && i === Math.round(p) && Math.abs(target - p) < 0.08) { if (typeof openProduct === 'function') openProduct(i); }
+    if (fromGarment && i === Math.round(p) && Math.abs(target - p) < 0.08) { openProduct(i); }
     else goTo(i);
   }
 
@@ -417,7 +417,76 @@
     if (op === 'inc') setQty(key, 1);
     else if (op === 'dec') setQty(key, -1);
     else if (op === 'rm') setQty(key, -item.qty);
-    else if (op === 'view' && window.ODY_openProduct) window.ODY_openProduct(item.i);
+    else if (op === 'view') openProduct(item.i);
+  });
+
+  /* ---------- Product page ---------- */
+  var pdpEl = $('.pdp'), pdBody = $('.pd-body'), relGrid = $('.rel-grid'), crumbs = $('.crumbs'), pdPos = $('.pd-pos'), swapT;
+  var SIZE_SVG = '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 7 H18 V13 H2 Z M5 7 V10 M8 7 V9 M11 7 V10 M14 7 V9" fill="none" stroke="currentColor" stroke-width="1.3"></path></svg>';
+  function fillProduct(i) {
+    var it = P[i];
+    pdpEl.setAttribute('aria-label', it.full);
+    crumbs.textContent = 'SHOP / ' + it.cat.toUpperCase() + ' / ' + it.t.toUpperCase();
+    pdPos.textContent = it.num + ' / 12';
+    var gal = it.imgs.map(function (im) {
+      return '<figure class="gfig ' + im.k + '"><img src="' + im.src + '" alt="' + esc(it.full + ' — ' + im.cap.toLowerCase()) + '"><figcaption class="mono">' + esc(im.cap) + '</figcaption></figure>';
+    }).join('');
+    var sizes = it.one ? '<span class="one">ONE SIZE</span>' : ['S', 'M', 'L', 'XL'].map(function (z) {
+      return '<button class="sz' + (state.size === z ? ' on' : '') + '" type="button" data-size="' + z + '" aria-pressed="' + (state.size === z) + '">' + z + '</button>';
+    }).join('');
+    pdBody.innerHTML =
+      '<div class="gal">' + gal + '</div>' +
+      '<p class="gdots mono" aria-hidden="true">' + it.imgs.length + ' VIEWS — SWIPE</p>' +
+      '<div class="pinfo"><div class="pinfo-in">' +
+      '<p class="p-k mono">' + it.num + ' — ' + esc(it.t.toUpperCase()) + ' — DROP 01</p>' +
+      '<div class="p-nw"><h1 class="p-n">' + esc(it.n) + '<span class="p-t">' + esc(it.t) + '</span></h1></div>' +
+      '<p class="p-price">[PRIX] €</p>' +
+      '<p class="p-desc">' + esc(it.desc) + '</p>' +
+      '<div class="p-buy" role="group" aria-label="Size">' + sizes +
+      '<button class="sg-link" type="button" data-info="size" aria-label="Size guide">' + SIZE_SVG + '<span class="sg-t">SIZE GUIDE</span></button></div>' +
+      '<button class="add p-add" type="button" data-action="padd"><span>ADD TO CART — [PRIX] €</span></button>' +
+      '<div class="acc">' +
+      '<details open><summary>Details</summary><ul>' + it.det.map(function (d) { return '<li>' + esc(d) + '</li>'; }).join('') + '</ul></details>' +
+      '<details><summary>Care</summary><p>[CARE INSTRUCTIONS]</p></details>' +
+      '<details><summary>Shipping &amp; returns</summary><p>Delivery options and costs are shown at checkout.</p><button class="lk2" type="button" data-info="ship">Shipping</button><button class="lk2" type="button" data-info="returns">Returns</button></details>' +
+      '</div>' +
+      '<p class="p-gps mono">ORIGIN POINT — VITRY, 94<br>48.79299323561635 N — 2.3939829756632616 E</p>' +
+      '</div></div>';
+    relGrid.innerHTML = [1, 2, 3, 4].map(function (d) {
+      var j = (i + d) % N, R = P[j];
+      return '<button class="rel-card" type="button" data-product="' + j + '"><span class="rel-img"><img src="' + R.img + '" alt=""></span><span class="rel-n">' + esc(R.full) + '</span><span class="rel-p mono">[PRIX] €</span></button>';
+    }).join('');
+  }
+  function openProduct(i) {
+    i = Math.max(0, Math.min(N - 1, i));
+    if (ui.pdp !== null && ui.pdp !== i) { swapProduct(i); return; }
+    fillProduct(i);
+    if (ui.pdp === null) pdpEl.scrollTop = 0;
+    setUi({ pdp: i, mega: false, menu: false, drawer: null });
+  }
+  function swapProduct(i) {
+    clearTimeout(swapT);
+    pdBody.classList.add('out');
+    if (ui.drawer) setUi({ drawer: null });
+    swapT = setTimeout(function () {
+      fillProduct(i);
+      ui.pdp = i;
+      pdBody.classList.remove('out');
+      try { pdpEl.scrollTo({ top: 0, behavior: 'smooth' }); } catch (err) { pdpEl.scrollTop = 0; }
+    }, 280);
+  }
+  function pdStep(d) { var c = ui.pdp === null ? 0 : ui.pdp; swapProduct((c + d + N) % N); }
+  // Zoom that follows the mouse on the gallery photos
+  pdBody.addEventListener('mousemove', function (e) {
+    var f = e.target.closest('.gfig'); if (!f) return;
+    var img = f.querySelector('img'), r = f.getBoundingClientRect();
+    img.style.transformOrigin = ((e.clientX - r.left) / r.width * 100).toFixed(1) + '% ' + ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%';
+  });
+  renderExtra.push(function () {
+    var open = ui.pdp !== null;
+    pdpEl.classList.toggle('open', open);
+    pdpEl.setAttribute('aria-hidden', open ? 'false' : 'true');
+    root.classList.toggle('pdpon', open);
   });
 
   /* ---------- In-page navigation (closes any open layer first) ---------- */
@@ -463,10 +532,10 @@
     if (t.hasAttribute('data-nav')) { e.preventDefault(); return navTo(t.getAttribute('data-nav')); }
     if (t.hasAttribute('data-info')) return setUi({ drawer: t.getAttribute('data-info'), menu: false, mega: false });
     if (t.hasAttribute('data-pick')) return pick(Number(t.getAttribute('data-pick')), t.classList.contains('garment'));
-    if (t.hasAttribute('data-open')) return openFromGrid(Number(t.getAttribute('data-open')));
+    if (t.hasAttribute('data-open')) return openProduct(Number(t.getAttribute('data-open')));
     if (t.hasAttribute('data-size')) {
       state.size = t.getAttribute('data-size');
-      sizeBtns.forEach(function (b) { b.classList.toggle('on', b === t); });
+      $$('[data-size]').forEach(function (b) { var on = b.getAttribute('data-size') === state.size; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
       return;
     }
     if (t.hasAttribute('data-filter')) return setFilter(t.getAttribute('data-filter'));
@@ -476,18 +545,22 @@
       setTimeout(function () { scrollToId('drop'); }, 60);
       return;
     }
-    if (t.hasAttribute('data-product')) { if (typeof openProduct === 'function') openProduct(Number(t.getAttribute('data-product'))); return; }
+    if (t.hasAttribute('data-product')) { openProduct(Number(t.getAttribute('data-product'))); return; }
     var a = t.getAttribute('data-action');
     if (a === 'next') next();
     else if (a === 'prev') prev();
     else if (a === 'skip') endIntro(true);
     else if (a === 'add') add();
-    else if (a === 'view') { if (typeof openProduct === 'function') openProduct(state.active); }
+    else if (a === 'view') { openProduct(state.active); }
     else if (a === 'cart') setUi({ drawer: 'cart', menu: false, mega: false });
     else if (a === 'menu') setUi({ menu: !ui.menu, drawer: null, mega: false });
     else if (a === 'shop') { shopOpen = !shopOpen; render(ui); }
     else if (a === 'mega') setUi({ mega: !ui.mega, drawer: null });
     else if (a === 'close-mega') setUi({ mega: false });
+    else if (a === 'close-pdp') setUi({ pdp: null });
+    else if (a === 'pd-next') pdStep(1);
+    else if (a === 'pd-prev') pdStep(-1);
+    else if (a === 'padd') { if (ui.pdp !== null) addItem(ui.pdp); }
     else if (a === 'close-drawer') setUi({ drawer: null });
     else if (a === 'checkout' && window.ODY_startCheckout) window.ODY_startCheckout();
   });
