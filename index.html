@@ -40,7 +40,7 @@
 <span class="hud-ways"><span class="way on">01 — ORIGIN</span><span class="way">02 — THE RACK</span><span class="way">03 — DROP 01</span><span class="way">04 — ODYSSEY</span><span class="way">05 — JOIN</span></span>
 <span class="hud-bar"><i></i></span>
 </div>
-<button class="cart" type="button">CART (<span data-cart-count>0</span>)</button>
+<button class="cart" type="button" data-action="cart">CART (<span data-cart-count>0</span>)</button>
 </div>
 </header>
 
@@ -272,6 +272,27 @@
 <div class="giant-wrap" data-rv><img class="giant" src="assets/img/logo-white.png" alt=""></div>
 <div class="legal mono"><span>© 2026 ODŸ — VITRY, 94</span><span>48.79299323561635 N — 2.3939829756632616 E</span><span>DREAMS COME TRUE WHEN YOU DON'T SLEEP</span></div>
 </footer>
+
+<!-- Drawer: bag + info (one panel, right on desktop, bottom sheet on phones) -->
+<div class="scrim" data-action="close-drawer" aria-hidden="true"></div>
+<aside class="drawer" role="dialog" aria-modal="true" aria-label="Bag" aria-hidden="true">
+<span class="grab" aria-hidden="true"></span>
+<div class="dw-head"><p class="dw-k mono">ODŸ — BAG</p><button class="dw-x" type="button" data-action="close-drawer">CLOSE</button></div>
+<div class="dw-view dw-cart">
+<div class="dw-body">
+<h2 class="dw-title">Your bag<sup data-cart-count>0</sup></h2>
+<div class="dw-empty"><p>Your bag is empty. The rack is waiting.</p><button class="dw-cta ghost" type="button" data-nav="rack"><span>BACK TO THE RACK</span></button></div>
+<ul class="bag"></ul>
+</div>
+<div class="dw-foot" hidden>
+<div class="sub"><span>Subtotal</span><span>[PRIX] €</span></div>
+<p class="fine2 mono">Shipping and taxes calculated at checkout.</p>
+<button class="dw-cta" type="button" data-action="checkout"><span>CHECKOUT</span></button>
+</div>
+</div>
+</aside>
+
+</div>
 
 <script src="js/main.js"></script>
 </body>

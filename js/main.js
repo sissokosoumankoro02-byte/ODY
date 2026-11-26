@@ -218,6 +218,7 @@
   // Keyboard: left / right arrows browse the rack while it is on screen
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (anyLock() || ui.mega) return;
     if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
     var r = rack.getBoundingClientRect(), vh = window.innerHeight || 900;
     if (r.top > vh * 0.5 || r.bottom < vh * 0.5) return;
@@ -225,25 +226,193 @@
     if (e.key === 'ArrowRight') next(); else prev();
   });
 
-  /* ---------- Cart (front-end only for now) ---------- */
-  var cartBtn = $('.cart'), cartCount = $('[data-cart-count]'), addBtn = $('.add'), addLabel = addBtn ? addBtn.querySelector('span') : null, addT;
-  function add() {
-    state.cart += 1;
-    cartCount.textContent = String(state.cart);
+  /* ---------- Product data: the 12 pieces, in rack order ----------
+     Texts come from the design reference. Placeholders in [BRACKETS] stay as they are. */
+  var IMG = 'assets/img/';
+  var TEE = ['Composition: [COMPOSITION]', 'Fit: [FIT]', 'Made in: [ORIGIN]'];
+  function gi(src, k, cap) { return { src: IMG + src, k: k, cap: cap }; }
+  var P = [
+    { n: 'Blue Face', t: 'Longsleeve', cat: 'Tops',
+      imgs: [gi('01-blue-face-longsleeve.webp', 'cut', 'FRONT'), gi('ls-blueface-studio.webp', 'bg', 'STUDIO'), gi('print-blueface.webp', 'art', 'PRINT — BLUE FACE')],
+      desc: 'Off-white longsleeve carrying the Blue Face: a portrait screen-printed in ultramarine, with the ODŸ wordmark running across the brow.',
+      det: ['Screen-printed front: Blue Face'].concat(TEE) },
+    { n: 'Motorcycle Accident', t: 'Tee', cat: 'Tops',
+      imgs: [gi('02-motorcycle-accident-tee.webp', 'cut', 'FRONT'), gi('tee-moto-studio.webp', 'bg dark', 'STUDIO'), gi('print-moto.webp', 'art', 'PRINT — MOTORCYCLE ACCIDENT')],
+      desc: 'White tee printed with Motorcycle Accident: an archive crash photo pushed into yellow and black halftone, signed with a faded ODŸ logo.',
+      det: ['Screen-printed front: Motorcycle Accident'].concat(TEE) },
+    { n: 'Head & Logo', t: 'Button-up shirt', cat: 'Tops',
+      imgs: [gi('03-head-logo-shirt.webp', 'cut', 'FRONT'), gi('bu-headlogo-studio.webp', 'bg', 'STUDIO'), gi('print-headlogo.webp', 'art', 'PRINT — HEAD & LOGO')],
+      desc: 'Pinstriped white shirt with an X-ray head printed in black and the ODŸ logo boxed in red on the chest.',
+      det: ['Screen-printed front: Head & Logo'].concat(TEE) },
+    { n: 'Ÿ 02', t: 'Tracksuit', cat: 'Tracksuits',
+      imgs: [gi('04-y02-tracksuit.webp', 'cut', 'FRONT'), gi('track-y2-back.webp', 'cut', 'BACK'), gi('track-y2-studio.webp', 'bg', 'STUDIO')],
+      desc: 'Blue tracksuit, jacket and pants, traced with contrast piping. The ODŸ logo sits on the chest and the leg, the Ÿ symbol runs across the back.',
+      det: ['Jacket and pants', 'Reflective ODŸ logo', 'Ÿ graphic on the back'].concat(TEE) },
+    { n: 'Mix Media', t: 'Longsleeve', cat: 'Tops',
+      imgs: [gi('05-mix-media-longsleeve.webp', 'cut', 'FRONT'), gi('ls-mxm-studio.webp', 'bg', 'STUDIO'), gi('print-mxm.webp', 'art', 'PRINT — MIX MEDIA')],
+      desc: 'Off-white longsleeve with a grid of eight archive portraits printed in black under the red ODŸ logo.',
+      det: ['Screen-printed front: Mix Media'].concat(TEE) },
+    { n: 'Jumping Girl', t: 'Tee', cat: 'Tops',
+      imgs: [gi('06-jumping-girl-tee.webp', 'cut', 'FRONT'), gi('tee-jump-studio.webp', 'bg dark', 'STUDIO'), gi('print-jump.webp', 'art', 'PRINT — JUMPING GIRL')],
+      desc: 'White tee printed with Jumping Girl: a figure caught mid-leap over the brand’s GPS coordinates, in yellow and red halftone.',
+      det: ['Screen-printed front: Jumping Girl'].concat(TEE) },
+    { n: 'Washed Denim', t: 'Jeans', cat: 'Denim',
+      imgs: [gi('07-washed-denim-jeans.webp', 'cut', 'FRONT'), gi('jeans-back.webp', 'cut', 'BACK'), gi('jeans-studio.webp', 'bg', 'STUDIO'), gi('logo-red.png', 'art', 'EMBROIDERY — RED ODŸ')],
+      desc: 'Washed jeans in a straight, loose cut, with the ODŸ logo embroidered in red at the front.',
+      det: ['Red ODŸ embroidery', 'ODŸ back label'].concat(TEE) },
+    { n: 'Blue Face', t: 'Button-up shirt', cat: 'Tops',
+      imgs: [gi('08-blue-face-shirt.webp', 'cut', 'FRONT'), gi('bu-blueface-studio.webp', 'bg', 'STUDIO'), gi('print-blueface.webp', 'art', 'PRINT — BLUE FACE')],
+      desc: 'Pinstriped white shirt carrying the Blue Face portrait in ultramarine, with the ODŸ wordmark running across the brow.',
+      det: ['Screen-printed front: Blue Face'].concat(TEE) },
+    { n: 'Medical Sisters', t: 'Tee', cat: 'Tops',
+      imgs: [gi('09-medical-sisters-tee.webp', 'cut', 'FRONT'), gi('tee-medsis-studio.webp', 'bg dark', 'STUDIO'), gi('print-medsis.webp', 'art', 'PRINT — MEDICAL SISTERS')],
+      desc: 'White tee printed with Medical Sisters: three figures from an archive photo, layered over the brand’s GPS coordinates in teal.',
+      det: ['Screen-printed front: Medical Sisters'].concat(TEE) },
+    { n: 'Ÿ 01', t: 'Tracksuit', cat: 'Tracksuits',
+      imgs: [gi('10-y01-tracksuit.webp', 'cut', 'FRONT'), gi('track-y1-back.webp', 'cut', 'BACK'), gi('track-y1-studio.webp', 'bg', 'STUDIO'), gi('pattern-ymono.webp', 'art', 'PATTERN — Ÿ MONOGRAM')],
+      desc: 'Black tracksuit with denim-blue panels on the hooded jacket, and the ODŸ logo on the chest and the leg.',
+      det: ['Jacket and pants', 'Reflective ODŸ logo', 'Ÿ monogram pattern'].concat(TEE) },
+    { n: 'Head & Logo', t: 'Longsleeve', cat: 'Tops',
+      imgs: [gi('11-head-logo-longsleeve.webp', 'cut', 'FRONT'), gi('ls-headlogo-studio.webp', 'bg', 'STUDIO'), gi('print-headlogo.webp', 'art', 'PRINT — HEAD & LOGO')],
+      desc: 'Off-white longsleeve with the X-ray head printed in black and the ODŸ logo boxed in red.',
+      det: ['Screen-printed front: Head & Logo'].concat(TEE) },
+    { n: 'Map Scarf', t: 'Scarf', cat: 'Accessories', one: true,
+      imgs: [gi('12-map-scarf.webp', 'cut', 'FLAT'), gi('scarf-studio.webp', 'bg', 'STUDIO'), gi('print-scarfmap.webp', 'art dark', 'PRINT — AERIAL MAP')],
+      desc: 'Square scarf printed with an aerial map in black and grey, signed with the ODŸ logo in white.',
+      det: ['Printed aerial map', 'White ODŸ logo', 'Dimensions: [DIMENSIONS]', 'Composition: [COMPOSITION]', 'Made in: [ORIGIN]'] }
+  ];
+  P.forEach(function (it, i) { it.img = it.imgs[0].src; it.full = it.t === 'Scarf' ? it.n : it.n + ' ' + it.t; it.num = (i < 9 ? '0' : '') + (i + 1); });
+  function esc(str) { return String(str).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  /* ---------- Overlays: drawer, menus, product page, checkout ----------
+     One small state object; render() applies it to the page. */
+  var ui = { drawer: null, menu: false, mega: false, pdp: null, co: false };
+  var lastDrawer = 'cart', focusT, returnFocus = null;
+  var scrim = $('.scrim'), drawer = $('.drawer'), dwX = $('.dw-x'), dwK = $('.dw-k');
+  function anyLock() { return !!(ui.drawer || ui.menu || ui.pdp !== null || ui.co); }
+  function setUi(patch) {
+    var was = {}; for (var k in ui) was[k] = ui[k];
+    for (var key in patch) ui[key] = patch[key];
+    render(was);
+  }
+  function render(was) {
+    // Drawer (bag + info tabs)
+    if (ui.drawer) lastDrawer = ui.drawer;
+    var dv = ui.drawer || lastDrawer;
+    drawer.classList.toggle('on', !!ui.drawer);
+    scrim.classList.toggle('on', !!ui.drawer);
+    drawer.setAttribute('aria-hidden', ui.drawer ? 'false' : 'true');
+    drawer.setAttribute('aria-label', dv === 'cart' ? 'Bag' : 'Information');
+    dwK.textContent = dv === 'cart' ? 'ODŸ — BAG' : 'ODŸ — INFO';
+    $$('.dw-view').forEach(function (v) { v.hidden = v.classList.contains('dw-cart') ? dv !== 'cart' : dv === 'cart'; });
+    $$('[data-tab]').forEach(function (b) { var on = b.getAttribute('data-tab') === dv; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    $$('[data-pane]').forEach(function (pn) { pn.hidden = pn.getAttribute('data-pane') !== dv; });
+    if (ui.drawer && !was.drawer) {
+      returnFocus = document.activeElement;
+      clearTimeout(focusT);
+      focusT = setTimeout(function () { dwX.focus({ preventScroll: true }); }, 90);
+    }
+    if (!ui.drawer && was.drawer && returnFocus && document.body.contains(returnFocus) && !anyLock()) {
+      try { returnFocus.focus({ preventScroll: true }); } catch (err) {}
+      returnFocus = null;
+    }
+    renderExtra.forEach(function (fn) { fn(was); });
+    // Lock the page scroll while a full-screen layer is open
+    se.style.overflow = anyLock() ? 'hidden' : '';
+  }
+  var renderExtra = [];
+  function closeTop() {
+    if (ui.drawer) setUi({ drawer: null });
+    else if (ui.mega) setUi({ mega: false });
+    else if (ui.menu) setUi({ menu: false });
+    else if (ui.pdp !== null) setUi({ pdp: null });
+    else if (ui.co) closeCo();
+  }
+  function closeCo() { setUi({ co: false }); }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.key === 'Esc') closeTop(); });
+
+  /* ---------- Bag (front-end only: the real checkout will be Shopify) ---------- */
+  var bag = [];
+  var cartBtn = $('.cart'), cartCounts = $$('[data-cart-count]'), addBtn = $('.add'), addLabel = addBtn ? addBtn.querySelector('span') : null, addT, openT;
+  var bagList = $('.bag'), bagEmpty = $('.dw-empty'), bagFoot = $('.dw-foot');
+  function bagCount() { return bag.reduce(function (n, b) { return n + b.qty; }, 0); }
+  function sizeLabel(b) { return b.size === 'ONE SIZE' ? 'ONE SIZE' : 'SIZE ' + b.size; }
+  function addItem(i) {
+    var it = P[i], size = it.one ? 'ONE SIZE' : state.size, key = i + '-' + size, found = null;
+    bag.forEach(function (b) { if (b.key === key) found = b; });
+    if (found) found.qty += 1; else bag.push({ key: key, i: i, size: size, qty: 1 });
+    renderBag();
     cartBtn.classList.remove('bump'); void cartBtn.offsetWidth; cartBtn.classList.add('bump');
-    addBtn.classList.add('done');
-    addLabel.textContent = 'ADDED — SIZE ' + state.size;
+    var label = it.one ? 'ADDED' : 'ADDED — SIZE ' + size;
+    $$('.add').forEach(function (b) { b.classList.add('done'); var sp = b.querySelector('span'); if (sp) { if (!sp.hasAttribute('data-idle')) sp.setAttribute('data-idle', sp.textContent); sp.textContent = label; } });
     clearTimeout(addT);
     addT = setTimeout(function () {
-      addBtn.classList.remove('done'); addLabel.textContent = 'ADD TO CART'; cartBtn.classList.remove('bump');
+      $$('.add').forEach(function (b) { b.classList.remove('done'); var sp = b.querySelector('span'); if (sp && sp.hasAttribute('data-idle')) sp.textContent = sp.getAttribute('data-idle'); });
+      cartBtn.classList.remove('bump');
     }, 1600);
+    clearTimeout(openT);
+    openT = setTimeout(function () { setUi({ drawer: 'cart', menu: false, mega: false }); }, 500);
+  }
+  function add() { addItem(state.active); }
+  function setQty(key, d) {
+    bag.forEach(function (b) { if (b.key === key) b.qty += d; });
+    bag = bag.filter(function (b) { return b.qty > 0; });
+    renderBag();
+  }
+  function renderBag() {
+    var c = bagCount();
+    cartCounts.forEach(function (el) { el.textContent = String(c); });
+    bagEmpty.hidden = c > 0;
+    bagFoot.hidden = c === 0;
+    var keep = {};
+    bag.forEach(function (b) {
+      keep[b.key] = true;
+      var li = bagList.querySelector('[data-key="' + b.key + '"]');
+      if (!li) {
+        var it = P[b.i];
+        li = document.createElement('li');
+        li.className = 'bag-it';
+        li.setAttribute('data-key', b.key);
+        li.innerHTML = '<button class="bag-img" type="button" data-bag="view" aria-label="View ' + esc(it.full) + '"><img src="' + it.img + '" alt=""></button>' +
+          '<div class="bag-meta"><p class="bag-t mono">' + esc(it.t) + '</p><p class="bag-n">' + esc(it.n) + '</p><p class="bag-s mono">' + sizeLabel(b) + ' — [PRIX] €</p>' +
+          '<div class="bag-row"><div class="qty"><button type="button" data-bag="dec" aria-label="Decrease quantity">−</button><span data-q></span><button type="button" data-bag="inc" aria-label="Increase quantity">+</button></div>' +
+          '<button class="bag-rm" type="button" data-bag="rm">REMOVE</button></div></div>';
+        bagList.appendChild(li);
+      }
+      li.querySelector('[data-q]').textContent = String(b.qty);
+    });
+    $$('.bag-it', bagList).forEach(function (li) { if (!keep[li.getAttribute('data-key')]) li.remove(); });
+    renderExtra.forEach(function (fn) { fn(null, 'bag'); });
+  }
+  bagList.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-bag]'); if (!b) return;
+    var key = b.closest('.bag-it').getAttribute('data-key'), op = b.getAttribute('data-bag');
+    var item = null; bag.forEach(function (x) { if (x.key === key) item = x; });
+    if (!item) return;
+    if (op === 'inc') setQty(key, 1);
+    else if (op === 'dec') setQty(key, -1);
+    else if (op === 'rm') setQty(key, -item.qty);
+    else if (op === 'view' && window.ODY_openProduct) window.ODY_openProduct(item.i);
+  });
+
+  /* ---------- In-page navigation (closes any open layer first) ---------- */
+  function scrollToId(id) {
+    var el = document.getElementById(id); if (!el) return;
+    var top = id === 'top' ? 0 : (se.scrollTop || window.scrollY || 0) + el.getBoundingClientRect().top + 1;
+    try { window.scrollTo({ top: top, behavior: 'smooth' }); } catch (err) { window.scrollTo(0, top); }
+  }
+  function navTo(id) {
+    setUi({ menu: false, mega: false, drawer: null, pdp: null });
+    setTimeout(function () { scrollToId(id); }, 30);
   }
 
   /* ---------- Delegated clicks ---------- */
   var sizeBtns = $$('[data-size]'), chips = $$('[data-filter]'), cards = $$('.card[data-cat]');
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('[data-pick],[data-open],[data-size],[data-filter],[data-action]');
+    var t = e.target.closest('[data-pick],[data-open],[data-size],[data-filter],[data-action],[data-nav],[data-info]');
     if (!t) return;
+    if (t.hasAttribute('data-nav')) { e.preventDefault(); return navTo(t.getAttribute('data-nav')); }
+    if (t.hasAttribute('data-info')) return setUi({ drawer: t.getAttribute('data-info'), menu: false, mega: false });
     if (t.hasAttribute('data-pick')) return goTo(Number(t.getAttribute('data-pick')));
     if (t.hasAttribute('data-open')) return openFromGrid(Number(t.getAttribute('data-open')));
     if (t.hasAttribute('data-size')) {
@@ -262,6 +431,9 @@
     else if (a === 'prev') prev();
     else if (a === 'skip') endIntro(true);
     else if (a === 'add') add();
+    else if (a === 'cart') setUi({ drawer: 'cart', menu: false, mega: false });
+    else if (a === 'close-drawer') setUi({ drawer: null });
+    else if (a === 'checkout' && window.ODY_startCheckout) window.ODY_startCheckout();
   });
 
   /* ---------- Newsletter ---------- */
