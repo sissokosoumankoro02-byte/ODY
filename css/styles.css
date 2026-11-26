@@ -347,3 +347,14 @@ html{scroll-behavior:auto}
 .giant{width:min(92%,1100px);transform:none}
 .giant-wrap:not(.in) .giant{transform:translateY(40%);opacity:0}
 .giant{transition:transform 1.6s cubic-bezier(.2,.8,.2,1),opacity 1s ease}
+
+/* ===== 1. Intro + hero: aerial view of Vitry (IGN) ===== */
+.ld-map{position:absolute;inset:0;background:url(../assets/img/vitry-map.webp) center/cover no-repeat;opacity:.6;filter:grayscale(1);transform-origin:50% 50%;pointer-events:none;animation:ldZoom 3.5s cubic-bezier(.55,0,.15,1) both}
+@keyframes ldZoom{0%{transform:scale(1);filter:grayscale(1) blur(8px);opacity:0}25%{opacity:.6}100%{transform:scale(1.9);filter:grayscale(1) blur(0);opacity:.6}}
+.ld-vig,.hero-vig{position:absolute;inset:0;pointer-events:none}
+.ld-vig{background:radial-gradient(ellipse at 50% 50%,rgba(21,21,19,.2) 0%,rgba(21,21,19,.55) 55%,rgba(21,21,19,.92) 100%)}
+.ld-vig::after,.hero-vig::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px)}
+.hero-map{position:absolute;inset:0;background:url(../assets/img/vitry-map.webp) center/cover no-repeat;opacity:.6;filter:grayscale(1);transform:scale(1.9);pointer-events:none;animation:heroMap 50s ease-in-out infinite alternate}
+@keyframes heroMap{from{transform:scale(1.9)}to{transform:scale(2.15) rotate(-1.5deg)}}
+.hero-vig{background:radial-gradient(ellipse at 50% 48%,rgba(21,21,19,.6) 0%,rgba(21,21,19,.3) 40%,rgba(21,21,19,.88) 100%)}
+@media (prefers-reduced-motion:reduce){.ld-map,.hero-map{animation:none}}
