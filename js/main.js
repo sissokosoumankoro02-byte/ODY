@@ -353,7 +353,6 @@
     else if (ui.pdp !== null) setUi({ pdp: null });
     else if (ui.co) closeCo();
   }
-  function closeCo() { setUi({ co: false }); }
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.key === 'Esc') closeTop(); });
 
   /* ---------- Bag (front-end only: the real checkout will be Shopify) ---------- */
@@ -407,7 +406,7 @@
       li.querySelector('[data-q]').textContent = String(b.qty);
     });
     $$('.bag-it', bagList).forEach(function (li) { if (!keep[li.getAttribute('data-key')]) li.remove(); });
-    renderExtra.forEach(function (fn) { fn(null, 'bag'); });
+    if (ui.co) renderCo();
   }
   bagList.addEventListener('click', function (e) {
     var b = e.target.closest('[data-bag]'); if (!b) return;
@@ -489,6 +488,79 @@
     root.classList.toggle('pdpon', open);
   });
 
+  /* ---------- Checkout (prototype: no order is placed, no payment is taken) ---------- */
+  var coEl = $('.co'), stepsEl = $('.steps'), sumBody = $('.sum-body'), sumT = $('.sum-t'), sumList = $('.sum-list'), shipCost = $('[data-ship-cost]');
+  var SHIP_NAMES = { std: 'Standard', exp: 'Express', relay: 'Pickup point' };
+  var co = { step: 1, max: 1, snap: [], sumOpen: false, cd: { email: '', news: true, country: 'France', first: '', last: '', addr: '', apt: '', zip: '', city: '', phone: '', ship: 'std', pay: 'card' } };
+  function coTop() { coEl.scrollTop = 0; }
+  function addrLine() {
+    var c = co.cd;
+    return [c.addr + (c.apt ? ', ' + c.apt : ''), (c.zip + ' ' + c.city).trim(), c.country].filter(function (x) { return x && x.trim(); }).join(', ');
+  }
+  function renderCo() {
+    var c = co.cd;
+    stepsEl.hidden = co.step === 4;
+    $$('.stp[data-step]').forEach(function (b) {
+      var n = Number(b.getAttribute('data-step'));
+      b.className = 'stp' + (co.step === n ? ' on' : (n <= co.max ? ' done' : ''));
+      b.disabled = n > co.max;
+      if (co.step === n) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+    $$('[data-co-step]').forEach(function (el) { el.hidden = Number(el.getAttribute('data-co-step')) !== co.step; });
+    var vals = { email: c.email, addr: addrLine(), first: c.first, ship: (SHIP_NAMES[c.ship] || 'Standard') + ' — [DELAY] — [PRICE] €', pay: c.pay === 'paypal' ? 'PayPal' : 'Credit card' };
+    $$('[data-cd]', coEl).forEach(function (el) { el.textContent = vals[el.getAttribute('data-cd')] || ''; });
+    shipCost.textContent = co.step >= 2 ? '[PRICE] €' : 'Calculated at the next step';
+    sumBody.classList.toggle('open', co.sumOpen);
+    sumT.setAttribute('aria-expanded', co.sumOpen ? 'true' : 'false');
+    sumT.firstChild.textContent = co.sumOpen ? 'Hide order summary' : 'Show order summary';
+    var list = co.step === 4 ? co.snap : bag;
+    sumList.innerHTML = list.map(function (b) {
+      var it = P[b.i];
+      return '<li><span class="sum-img"><img src="' + it.img + '" alt=""><i>' + b.qty + '</i></span><span class="sum-n">' + esc(it.full) + '<small>' + sizeLabel(b) + '</small></span><span class="sum-p">[PRIX] €</span></li>';
+    }).join('') || '<li class="sum-empty">Your bag is empty.</li>';
+  }
+  function startCheckout() {
+    if (!bag.length) return;
+    co.step = 1; co.sumOpen = false;
+    renderCo();
+    setUi({ co: true, drawer: null, menu: false, mega: false });
+    setTimeout(coTop, 30);
+  }
+  function closeCo() {
+    if (co.step === 4) { co.step = 1; co.max = 1; co.snap = []; }
+    setUi({ co: false });
+    renderCo();
+  }
+  function goStep(n) { if (n <= co.max && co.step !== 4) { co.step = n; renderCo(); coTop(); } }
+  $$('.co-form').forEach(function (f) {
+    // The browser checks the required fields first: this only runs once the form is valid
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var fd = new FormData(f), v = function (k) { return String(fd.get(k) || '').trim(); };
+      var st = Number(f.getAttribute('data-co-step'));
+      if (st === 1) {
+        co.cd.email = v('email'); co.cd.news = fd.get('news') === 'on'; co.cd.country = v('country') || 'France';
+        co.cd.first = v('first'); co.cd.last = v('last'); co.cd.addr = v('addr'); co.cd.apt = v('apt');
+        co.cd.zip = v('zip'); co.cd.city = v('city'); co.cd.phone = v('phone');
+        co.step = 2; co.max = Math.max(co.max, 2);
+      } else if (st === 2) {
+        co.cd.ship = v('ship') || 'std';
+        co.step = 3; co.max = Math.max(co.max, 3);
+      } else if (st === 3) {
+        co.cd.pay = v('pay') || 'card';
+        co.snap = bag.slice(); bag = [];
+        renderBag();
+        co.step = 4; co.max = 4;
+      }
+      renderCo(); coTop();
+    });
+  });
+  renderExtra.push(function () {
+    coEl.classList.toggle('open', ui.co);
+    coEl.setAttribute('aria-hidden', ui.co ? 'false' : 'true');
+    root.classList.toggle('coon', ui.co);
+  });
+
   /* ---------- In-page navigation (closes any open layer first) ---------- */
   function scrollToId(id) {
     var el = document.getElementById(id); if (!el) return;
@@ -527,8 +599,9 @@
   /* ---------- Delegated clicks ---------- */
   var sizeBtns = $$('[data-size]'), chips = $$('[data-filter]'), cards = $$('.card[data-cat]');
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('[data-pick],[data-open],[data-size],[data-filter],[data-cat],[data-product],[data-action],[data-nav],[data-info]');
+    var t = e.target.closest('[data-pick],[data-open],[data-size],[data-filter],[data-cat],[data-product],[data-action],[data-nav],[data-info],[data-step]');
     if (!t) return;
+    if (t.hasAttribute('data-step')) return goStep(Number(t.getAttribute('data-step')));
     if (t.hasAttribute('data-nav')) { e.preventDefault(); return navTo(t.getAttribute('data-nav')); }
     if (t.hasAttribute('data-info')) return setUi({ drawer: t.getAttribute('data-info'), menu: false, mega: false });
     if (t.hasAttribute('data-pick')) return pick(Number(t.getAttribute('data-pick')), t.classList.contains('garment'));
@@ -562,7 +635,11 @@
     else if (a === 'pd-prev') pdStep(-1);
     else if (a === 'padd') { if (ui.pdp !== null) addItem(ui.pdp); }
     else if (a === 'close-drawer') setUi({ drawer: null });
-    else if (a === 'checkout' && window.ODY_startCheckout) window.ODY_startCheckout();
+    else if (a === 'checkout') startCheckout();
+    else if (a === 'close-co') closeCo();
+    else if (a === 'co-bag') setUi({ co: false, drawer: 'cart' });
+    else if (a === 'co-done') { co.step = 1; co.max = 1; co.snap = []; setUi({ co: false, pdp: null }); renderCo(); }
+    else if (a === 'toggle-sum') { co.sumOpen = !co.sumOpen; renderCo(); }
   });
 
   /* ---------- Newsletter ---------- */

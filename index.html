@@ -347,6 +347,98 @@
 </div>
 </div>
 
+<!-- Checkout: prototype only. No order is placed, no payment is taken (Shopify will handle it later). -->
+<div class="co" role="dialog" aria-modal="true" aria-label="Checkout" aria-hidden="true">
+<div class="co-in">
+<header class="co-hdr">
+<button class="co-logo" type="button" data-action="close-co" aria-label="Back to the store"><img src="assets/img/logo-black.png" alt="ODŸ"></button>
+<span class="co-sec mono"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M2 6 V4 a4 4 0 0 1 8 0 V6 M1 6 H11 V13 H1 Z" fill="none" stroke="currentColor" stroke-width="1.3"></path></svg>SECURE CHECKOUT</span>
+<button class="co-x" type="button" data-action="close-co">BACK TO STORE</button>
+</header>
+<div class="co-grid">
+<div class="co-main">
+<p class="co-proto mono">PROTOTYPE — NO ORDER IS PLACED AND NO PAYMENT IS TAKEN</p>
+<ol class="steps" aria-label="Checkout steps">
+<li><button class="stp done" type="button" data-action="co-bag">Bag</button></li>
+<li><button class="stp on" type="button" data-step="1" aria-current="step">Information</button></li>
+<li><button class="stp" type="button" data-step="2" disabled>Shipping</button></li>
+<li><button class="stp" type="button" data-step="3" disabled>Payment</button></li>
+</ol>
+
+<form class="co-form" data-co-step="1">
+<h2 class="co-h">Contact</h2>
+<div class="fld"><label for="co-email">Email</label><input id="co-email" name="email" type="email" required autocomplete="email"></div>
+<label class="chk"><input type="checkbox" name="news" checked><span>Email me about the next drops</span></label>
+<h2 class="co-h">Shipping address</h2>
+<div class="fld"><label for="co-country">Country / region</label><select id="co-country" name="country" autocomplete="country-name"><option value="France" selected>France</option><option value="Belgium">Belgium</option><option value="Switzerland">Switzerland</option><option value="Luxembourg">Luxembourg</option><option value="Germany">Germany</option><option value="United Kingdom">United Kingdom</option></select></div>
+<div class="row2"><div class="fld"><label for="co-first">First name</label><input id="co-first" name="first" required autocomplete="given-name"></div><div class="fld"><label for="co-last">Last name</label><input id="co-last" name="last" required autocomplete="family-name"></div></div>
+<div class="fld"><label for="co-addr">Address</label><input id="co-addr" name="addr" required autocomplete="address-line1"></div>
+<div class="fld"><label for="co-apt">Apartment, suite (optional)</label><input id="co-apt" name="apt" autocomplete="address-line2"></div>
+<div class="row2"><div class="fld"><label for="co-zip">Postal code</label><input id="co-zip" name="zip" required autocomplete="postal-code"></div><div class="fld"><label for="co-city">City</label><input id="co-city" name="city" required autocomplete="address-level2"></div></div>
+<div class="fld"><label for="co-phone">Phone (optional)</label><input id="co-phone" name="phone" type="tel" autocomplete="tel"></div>
+<div class="co-act"><button class="co-back" type="button" data-action="co-bag">← RETURN TO BAG</button><button class="co-go" type="submit"><span>Continue to shipping</span></button></div>
+</form>
+
+<form class="co-form" data-co-step="2" hidden>
+<div class="review">
+<div class="rv"><span class="rv-k">CONTACT</span><span data-cd="email"></span><button class="rv-c" type="button" data-step="1">Change</button></div>
+<div class="rv"><span class="rv-k">SHIP TO</span><span data-cd="addr"></span><button class="rv-c" type="button" data-step="1">Change</button></div>
+</div>
+<h2 class="co-h">Shipping method</h2>
+<div class="opts">
+<label class="opt"><input type="radio" name="ship" value="std" checked><span class="o-t">Standard<small>[DELAY]</small></span><span class="o-p">[PRICE] €</span></label>
+<label class="opt"><input type="radio" name="ship" value="exp"><span class="o-t">Express<small>[DELAY]</small></span><span class="o-p">[PRICE] €</span></label>
+<label class="opt"><input type="radio" name="ship" value="relay"><span class="o-t">Pickup point<small>[DELAY]</small></span><span class="o-p">[PRICE] €</span></label>
+</div>
+<div class="co-act"><button class="co-back" type="button" data-step="1">← RETURN TO INFORMATION</button><button class="co-go" type="submit"><span>Continue to payment</span></button></div>
+</form>
+
+<form class="co-form" data-co-step="3" hidden>
+<div class="review">
+<div class="rv"><span class="rv-k">CONTACT</span><span data-cd="email"></span><button class="rv-c" type="button" data-step="1">Change</button></div>
+<div class="rv"><span class="rv-k">SHIP TO</span><span data-cd="addr"></span><button class="rv-c" type="button" data-step="1">Change</button></div>
+<div class="rv"><span class="rv-k">METHOD</span><span data-cd="ship"></span><button class="rv-c" type="button" data-step="2">Change</button></div>
+</div>
+<h2 class="co-h">Payment</h2>
+<div class="opts">
+<label class="opt"><input type="radio" name="pay" value="card" checked><span class="o-t">Credit card<small>VISA — MASTERCARD — AMEX</small></span><span></span></label>
+<div class="cardbox" aria-hidden="true"><span>Card number</span><span>Expiration date (MM / YY)</span><span>Security code</span><span>Name on card</span><p class="mono">On the live store, Shopify Payments shows the secure card fields here.</p></div>
+<label class="opt"><input type="radio" name="pay" value="paypal"><span class="o-t">PayPal</span><span></span></label>
+</div>
+<h2 class="co-h">Billing address</h2>
+<div class="opts">
+<label class="opt"><input type="radio" name="bill" value="same" checked><span class="o-t">Same as shipping address</span><span></span></label>
+<label class="opt"><input type="radio" name="bill" value="diff"><span class="o-t">Use a different billing address</span><span></span></label>
+</div>
+<div class="co-act"><button class="co-back" type="button" data-step="2">← RETURN TO SHIPPING</button><button class="co-go" type="submit"><span>Pay now</span></button></div>
+</form>
+
+<div class="co-done" data-co-step="4" hidden>
+<svg class="co-tick" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="36"></circle><path d="M24 41 L35 52 L57 29"></path></svg>
+<p class="done-k mono">ORDER [#NUMBER] — CONFIRMED</p>
+<h2 class="done-t">Thank you, <span data-cd="first"></span>.</h2>
+<p class="done-p">Your pieces are leaving the rack. A confirmation will be sent to <span data-cd="email"></span>.</p>
+<div class="review">
+<div class="rv"><span class="rv-k">SHIP TO</span><span data-cd="addr"></span><span></span></div>
+<div class="rv"><span class="rv-k">METHOD</span><span data-cd="ship"></span><span></span></div>
+<div class="rv"><span class="rv-k">PAYMENT</span><span data-cd="pay"></span><span></span></div>
+</div>
+<button class="co-go" type="button" data-action="co-done"><span>Continue shopping</span></button>
+</div>
+</div>
+<aside class="co-sum" aria-label="Order summary">
+<button class="sum-t" type="button" data-action="toggle-sum" aria-expanded="false"><span>Show order summary</span><span>[PRIX] €</span></button>
+<div class="sum-body">
+<ul class="sum-list"></ul>
+<div class="sum-row"><span>Subtotal</span><span>[PRIX] €</span></div>
+<div class="sum-row"><span>Shipping</span><span data-ship-cost>Calculated at the next step</span></div>
+<div class="sum-row tot"><span>Total</span><span>EUR [PRIX] €</span></div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+
 <!-- Drawer: bag + info (one panel, right on desktop, bottom sheet on phones) -->
 <div class="scrim" data-action="close-drawer" aria-hidden="true"></div>
 <aside class="drawer" role="dialog" aria-modal="true" aria-label="Bag" aria-hidden="true">
