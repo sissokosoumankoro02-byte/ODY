@@ -794,3 +794,6 @@ html{scroll-behavior:auto}
 *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
 html{scroll-behavior:auto!important}
 }
+/* Rack: VIEW PIECE keeps a 44px touch area without making the product text taller
+   (otherwise the text slid up under the arrows) */
+.i-view{margin:-12px 0}
