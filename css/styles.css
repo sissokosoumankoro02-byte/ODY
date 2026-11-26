@@ -783,3 +783,14 @@ html{scroll-behavior:auto}
 @media (max-width:900px){.map{max-width:420px}}
 @media (max-width:760px){.map{width:300px;max-width:300px}}
 @media (prefers-reduced-motion:reduce){.map-img{animation:none}}
+
+/* ===== 11. Robustness: 44px touch targets, reduced motion ===== */
+.i-view,.rv-c,.mg-l,.mg-cats button{min-height:44px}
+.stp{min-width:44px}
+.qty button{height:44px}
+.hdr-logo{display:flex;align-items:center;min-height:44px}
+.links a,.lk{display:flex;align-items:center;min-height:44px;padding:0}
+@media (prefers-reduced-motion:reduce){
+*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+html{scroll-behavior:auto!important}
+}

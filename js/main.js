@@ -216,10 +216,6 @@
     lastUser = Date.now();
     target = i;
   }
-  function openFromGrid(i) {
-    goTo(i);
-    rack.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
   function next() { var c = Math.round(target); goTo(c >= N - 1 ? 0 : c + 1); }
   function prev() { var c = Math.round(target); goTo(c <= 0 ? N - 1 : c - 1); }
 
@@ -347,17 +343,18 @@
   }
   var renderExtra = [];
   function closeTop() {
+    // Close the layer on top first: drawer, checkout, menus, then the product page
     if (ui.drawer) setUi({ drawer: null });
+    else if (ui.co) closeCo();
     else if (ui.mega) setUi({ mega: false });
     else if (ui.menu) setUi({ menu: false });
     else if (ui.pdp !== null) setUi({ pdp: null });
-    else if (ui.co) closeCo();
   }
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.key === 'Esc') closeTop(); });
 
   /* ---------- Bag (front-end only: the real checkout will be Shopify) ---------- */
   var bag = [];
-  var cartBtn = $('.cart'), cartCounts = $$('[data-cart-count]'), addBtn = $('.add'), addLabel = addBtn ? addBtn.querySelector('span') : null, addT, openT;
+  var cartBtn = $('.cart'), cartCounts = $$('[data-cart-count]'), addBtn = $('.add'), addT, openT;
   var bagList = $('.bag'), bagEmpty = $('.dw-empty'), bagFoot = $('.dw-foot');
   function bagCount() { return bag.reduce(function (n, b) { return n + b.qty; }, 0); }
   function sizeLabel(b) { return b.size === 'ONE SIZE' ? 'ONE SIZE' : 'SIZE ' + b.size; }
