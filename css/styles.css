@@ -416,3 +416,31 @@ html{scroll-behavior:auto}
 .dw-foot{padding:16px 20px 20px}
 .dw-title{font-size:40px}
 }
+
+/* ===== 4. Info panel: size guide, shipping, returns, contact (tabs in the drawer) ===== */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
+.tab{height:44px;padding:0 14px;border:1px solid #151513;border-radius:999px;background:transparent;color:#151513;font:700 11px 'Archivo',sans-serif;letter-spacing:.1em;cursor:pointer;transition:background .3s,color .3s}
+.tab.on{background:#151513;color:#F3F3F1}
+.ipane{animation:paneIn .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes paneIn{from{opacity:0;transform:translateY(16px)}}
+.ipane h3{margin:0 0 12px;font-size:30px;font-weight:900;line-height:.95;letter-spacing:-.035em;text-transform:uppercase}
+.ipane p{margin:0 0 14px;font-size:14px;line-height:1.55}
+.ph{color:#6A6A6A}
+.sg-label{display:block;width:170px;height:auto;margin:4px 0 18px}
+.sg{width:100%;border-collapse:collapse;font-size:12px}
+.sg th,.sg td{padding:11px 6px;border-bottom:1px solid #cfcfcb;text-align:center}
+.sg th{font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.1em}
+.sg th:first-child,.sg td:first-child{text-align:left;font-weight:700}
+.sg td{color:#6A6A6A}
+.sg td:first-child{color:#151513}
+.irow{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #cfcfcb;font-size:13px}
+.irow span:first-child{font-weight:800;text-transform:uppercase}
+.irow span:last-child{color:#6A6A6A;text-align:right}
+.ilink{display:inline-flex;align-items:center;min-height:44px;margin-top:8px;color:#151513;font-weight:700;text-decoration:underline;text-underline-offset:4px}
+.sg-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:44px;min-height:44px;padding:0 6px;border:0;background:none;color:#151513;font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;cursor:pointer}
+.sg-link .sg-t{text-decoration:underline;text-underline-offset:3px}
+.sg-link:hover{color:#C83636}
+.lk{display:block;padding:7px 0;border:0;background:none;color:#F3F3F1;font:600 15px 'Archivo',sans-serif;text-align:left;cursor:pointer}
+.lk:hover{color:#C83636}
+.ipane[hidden]{display:none}
+@media (max-width:760px){.sg-link{width:44px;padding:0;border:1px solid #151513}.sg-t{display:none}}

@@ -136,6 +136,7 @@
 <button class="sz on" type="button" data-size="M">M</button>
 <button class="sz" type="button" data-size="L">L</button>
 <button class="sz" type="button" data-size="XL">XL</button>
+<button class="sg-link" type="button" data-info="size" aria-label="Size guide"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 7 H18 V13 H2 Z M5 7 V10 M8 7 V9 M11 7 V10 M14 7 V9" fill="none" stroke="currentColor" stroke-width="1.3"></path></svg><span class="sg-t">SIZE GUIDE</span></button>
 <button class="add" type="button" data-action="add"><span>ADD TO CART</span></button>
 </div>
 </div>
@@ -263,8 +264,8 @@
 </form>
 <p class="thanks" hidden>WELCOME ABOARD. YOU'LL HEAR FROM US BEFORE DROP 02.</p>
 <div class="links">
-<div><p class="lh mono">SHOP</p><a href="#rack">The Rack</a><a href="#drop">Drop 01</a><a href="#drop">Size guide</a></div>
-<div><p class="lh mono">INFO</p><a href="#odyssey">Odyssey</a><a href="#join">Shipping</a><a href="#join">Returns</a><a href="#join">Contact</a></div>
+<div><p class="lh mono">SHOP</p><a href="#rack">The Rack</a><a href="#drop">Drop 01</a><button class="lk" type="button" data-info="size">Size guide</button></div>
+<div><p class="lh mono">INFO</p><a href="#odyssey">Odyssey</a><button class="lk" type="button" data-info="ship">Shipping</button><button class="lk" type="button" data-info="returns">Returns</button><button class="lk" type="button" data-info="contact">Contact</button></div>
 <div><p class="lh mono">FOLLOW</p><a href="#join">Instagram</a><a href="#join">TikTok</a></div>
 </div>
 </div>
@@ -288,6 +289,39 @@
 <div class="sub"><span>Subtotal</span><span>[PRIX] €</span></div>
 <p class="fine2 mono">Shipping and taxes calculated at checkout.</p>
 <button class="dw-cta" type="button" data-action="checkout"><span>CHECKOUT</span></button>
+</div>
+</div>
+<div class="dw-view dw-info" hidden>
+<div class="dw-body">
+<div class="tabs" role="tablist" aria-label="Info">
+<button class="tab" type="button" role="tab" data-tab="size" data-info="size">Size guide</button>
+<button class="tab" type="button" role="tab" data-tab="ship" data-info="ship">Shipping</button>
+<button class="tab" type="button" role="tab" data-tab="returns" data-info="returns">Returns</button>
+<button class="tab" type="button" role="tab" data-tab="contact" data-info="contact">Contact</button>
+</div>
+<div class="ipane" data-pane="size">
+<h3>Size guide</h3>
+<img class="sg-label" src="assets/img/size-label.png" alt="ODŸ size label: S, M, L, XL">
+<table class="sg"><thead><tr><th>CM</th><th>S</th><th>M</th><th>L</th><th>XL</th></tr></thead><tbody><tr><td>Chest</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Length</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Sleeve</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody></table>
+<p class="ph" style="margin-top:16px">[YOUR MEASUREMENTS — one table per cut: tees, longsleeves, shirts, tracksuits, jeans]</p>
+</div>
+<div class="ipane" data-pane="ship" hidden>
+<h3>Shipping</h3>
+<div class="irow"><span>France</span><span>[DELAY] — [PRICE] €</span></div>
+<div class="irow"><span>Europe</span><span>[DELAY] — [PRICE] €</span></div>
+<div class="irow"><span>Worldwide</span><span>[DELAY] — [PRICE] €</span></div>
+<p class="ph" style="margin-top:16px">[YOUR SHIPPING POLICY]</p>
+</div>
+<div class="ipane" data-pane="returns" hidden>
+<h3>Returns</h3>
+<p class="ph">[YOUR RETURN POLICY — return window, condition of the pieces, how to start a return]</p>
+</div>
+<div class="ipane" data-pane="contact" hidden>
+<h3>Contact</h3>
+<div class="irow"><span>Email</span><span>[CONTACT EMAIL]</span></div>
+<div class="irow"><span>Studio</span><span>Vitry-sur-Seine, 94</span></div>
+<a class="ilink" href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
+</div>
 </div>
 </div>
 </aside>
