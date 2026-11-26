@@ -33,7 +33,7 @@
 <div class="ld-line" aria-hidden="true"></div>
 
 <header class="hdr">
-<nav class="nav" aria-label="Main"><a href="#rack">The Rack</a><a href="#drop">Drop 01</a><a href="#odyssey">Odyssey</a></nav>
+<div class="hl"><nav class="nav" aria-label="Main"><button class="navb" type="button" data-action="mega" aria-expanded="false">Shop<i class="caret" aria-hidden="true"></i></button><a href="#rack" data-nav="rack">The Rack</a><a href="#odyssey" data-nav="odyssey">Odyssey</a></nav><button class="mbtn" type="button" data-action="menu" aria-label="Open menu" aria-expanded="false">MENU</button></div>
 <a class="hdr-logo" href="#top" aria-label="ODŸ — home"><img src="assets/img/logo-white.png" alt="ODŸ"></a>
 <div class="hdr-right">
 <div class="hud mono" aria-hidden="true">
@@ -274,6 +274,62 @@
 <div class="giant-wrap" data-rv><img class="giant" src="assets/img/logo-white.png" alt=""></div>
 <div class="legal mono"><span>© 2026 ODŸ — VITRY, 94</span><span>48.79299323561635 N — 2.3939829756632616 E</span><span>DREAMS COME TRUE WHEN YOU DON'T SLEEP</span></div>
 </footer>
+
+<!-- Phone menu: full screen, opens as a circle from the MENU button -->
+<div class="menu" aria-hidden="true">
+<div>
+<nav class="mlinks" aria-label="Menu">
+<button class="mshop" type="button" data-action="shop" aria-expanded="false"><small>01</small><span>Shop</span><i class="caret" aria-hidden="true"></i></button>
+<div class="mcats"><div>
+<button type="button" data-cat="all">All<sup>12</sup></button>
+<button type="button" data-cat="tops">Tops<sup>08</sup></button>
+<button type="button" data-cat="tracks">Tracksuits<sup>02</sup></button>
+<button type="button" data-cat="bottoms">Denim<sup>01</sup></button>
+<button type="button" data-cat="acc">Accessories<sup>01</sup></button>
+</div></div>
+<a href="#rack" data-nav="rack"><small>02</small><span>The Rack</span></a>
+<a href="#drop" data-nav="drop"><small>03</small><span>Drop 01</span></a>
+<a href="#odyssey" data-nav="odyssey"><small>04</small><span>Odyssey</span></a>
+<a href="#join" data-nav="join"><small>05</small><span>Join</span></a>
+</nav>
+<div class="minfo"><button type="button" data-info="size">Size guide</button><button type="button" data-info="ship">Shipping</button><button type="button" data-info="returns">Returns</button><button type="button" data-info="contact">Contact</button></div>
+</div>
+<div class="mfoot mono"><span>ORIGIN POINT — VITRY, 94</span><span>48.79299323561635 N</span><span>2.3939829756632616 E</span></div>
+</div>
+
+<!-- Desktop mega menu: drops down like a curtain from SHOP -->
+<div class="mega-scrim" data-action="close-mega" aria-hidden="true"></div>
+<div class="mega" aria-hidden="true">
+<div class="mega-in">
+<div>
+<p class="mg-k mono">SHOP — DROP 01</p>
+<ul class="mg-cats">
+<li><button type="button" data-cat="all">All pieces<sup>12</sup></button></li>
+<li><button type="button" data-cat="tops">Tops<sup>08</sup></button></li>
+<li><button type="button" data-cat="tracks">Tracksuits<sup>02</sup></button></li>
+<li><button type="button" data-cat="bottoms">Denim<sup>01</sup></button></li>
+<li><button type="button" data-cat="acc">Accessories<sup>01</sup></button></li>
+</ul>
+</div>
+<div>
+<p class="mg-k mono">NEW IN</p>
+<div class="mg-cards">
+<button class="mg-card" type="button" data-product="0"><span class="mg-img"><img src="assets/img/01-blue-face-longsleeve.webp" alt=""></span><span class="mg-n">Blue Face Longsleeve</span><span class="mg-p mono">[PRIX] €</span></button>
+<button class="mg-card" type="button" data-product="3"><span class="mg-img"><img src="assets/img/04-y02-tracksuit.webp" alt=""></span><span class="mg-n">Ÿ 02 Tracksuit</span><span class="mg-p mono">[PRIX] €</span></button>
+<button class="mg-card" type="button" data-product="11"><span class="mg-img"><img src="assets/img/12-map-scarf.webp" alt=""></span><span class="mg-n">Map Scarf</span><span class="mg-p mono">[PRIX] €</span></button>
+</div>
+</div>
+<div class="mg-info">
+<p class="mg-k mono">INFO</p>
+<button class="mg-l" type="button" data-info="size">Size guide</button>
+<button class="mg-l" type="button" data-info="ship">Shipping</button>
+<button class="mg-l" type="button" data-info="returns">Returns</button>
+<button class="mg-l" type="button" data-info="contact">Contact</button>
+<a class="mg-cta mono" href="#rack" data-nav="rack">ENTER THE RACK →</a>
+<p class="mg-gps mono">ORIGIN POINT — VITRY, 94<br>48.79299323561635 N<br>2.3939829756632616 E</p>
+</div>
+</div>
+</div>
 
 <!-- Drawer: bag + info (one panel, right on desktop, bottom sheet on phones) -->
 <div class="scrim" data-action="close-drawer" aria-hidden="true"></div>
