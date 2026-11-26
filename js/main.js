@@ -107,6 +107,10 @@
       [infos[i], nums[i]].forEach(function (el) { if (!el) return; el.classList.remove('on', 'up'); if (c) el.classList.add(c); });
       if (ticks[i]) ticks[i].classList.toggle('on', i === a);
     }
+    // The scarf has one size: show "ONE SIZE" instead of S / M / L / XL
+    var one = !!(typeof P !== 'undefined' && P[a] && P[a].one);
+    $$('.buy [data-size]').forEach(function (b) { b.hidden = one; });
+    var oneEl = $('.buy .one'); if (oneEl) oneEl.hidden = !one;
   }
 
   /* ---------- Header waypoint HUD ---------- */
@@ -218,6 +222,23 @@
   }
   function next() { var c = Math.round(target); goTo(c >= N - 1 ? 0 : c + 1); }
   function prev() { var c = Math.round(target); goTo(c <= 0 ? N - 1 : c - 1); }
+
+  // Swipe left / right on the rack (finger or mouse drag)
+  var px = null, py = 0, swiped = 0;
+  stage.addEventListener('pointerdown', function (e) { px = e.clientX; py = e.clientY; });
+  stage.addEventListener('pointercancel', function () { px = null; });
+  stage.addEventListener('pointerleave', function () { px = null; });
+  stage.addEventListener('pointerup', function (e) {
+    if (px === null) return;
+    var dx = e.clientX - px, dy = e.clientY - py; px = null;
+    if (Math.abs(dx) > 36 && Math.abs(dx) > Math.abs(dy) * 1.2) { swiped = Date.now(); if (dx < 0) next(); else prev(); }
+  });
+  // Click on a piece: the one in front opens its product page, another one comes to the front
+  function pick(i, fromGarment) {
+    if (Date.now() - swiped < 350) return;
+    if (fromGarment && i === Math.round(p) && Math.abs(target - p) < 0.08) { if (typeof openProduct === 'function') openProduct(i); }
+    else goTo(i);
+  }
 
   // Keyboard: left / right arrows browse the rack while it is on screen
   document.addEventListener('keydown', function (e) {
@@ -417,7 +438,7 @@
     if (!t) return;
     if (t.hasAttribute('data-nav')) { e.preventDefault(); return navTo(t.getAttribute('data-nav')); }
     if (t.hasAttribute('data-info')) return setUi({ drawer: t.getAttribute('data-info'), menu: false, mega: false });
-    if (t.hasAttribute('data-pick')) return goTo(Number(t.getAttribute('data-pick')));
+    if (t.hasAttribute('data-pick')) return pick(Number(t.getAttribute('data-pick')), t.classList.contains('garment'));
     if (t.hasAttribute('data-open')) return openFromGrid(Number(t.getAttribute('data-open')));
     if (t.hasAttribute('data-size')) {
       state.size = t.getAttribute('data-size');
@@ -435,6 +456,7 @@
     else if (a === 'prev') prev();
     else if (a === 'skip') endIntro(true);
     else if (a === 'add') add();
+    else if (a === 'view') { if (typeof openProduct === 'function') openProduct(state.active); }
     else if (a === 'cart') setUi({ drawer: 'cart', menu: false, mega: false });
     else if (a === 'close-drawer') setUi({ drawer: null });
     else if (a === 'checkout' && window.ODY_startCheckout) window.ODY_startCheckout();

@@ -500,3 +500,12 @@ html{scroll-behavior:auto}
 .lk:hover{color:#C83636}
 .ipane[hidden]{display:none}
 @media (max-width:760px){.sg-link{width:44px;padding:0;border:1px solid #151513}.sg-t{display:none}}
+
+/* ===== 6. Rack: swipe, VIEW PIECE link, ONE SIZE for the scarf ===== */
+.one{display:inline-flex;align-items:center;height:44px;padding:0 14px;border:1px solid #151513;font:600 11px 'Archivo',sans-serif;letter-spacing:.1em}
+.info.on{pointer-events:auto}
+.i-price{display:flex;justify-content:center;align-items:center;gap:12px}
+.i-view{min-height:36px;padding:0;border:0;background:none;color:#C83636;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.12em;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.one[hidden],.buy .sz[hidden]{display:none}
+.stage{touch-action:pan-y}
+.garment,.gimg{-webkit-user-select:none;user-select:none}
