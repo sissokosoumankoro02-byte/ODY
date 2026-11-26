@@ -85,9 +85,13 @@
     root.classList.toggle('pin', s.pin);
     if (hint) hint.textContent = 'USE THE ARROWS — CLICK A PIECE';
   }
-  function measure() {
-    state.vh = window.innerHeight || 900;
-    state.vw = window.innerWidth || 1440;
+  function measure(force) {
+    var vh = window.innerHeight || 900, vw = window.innerWidth || 1440;
+    // On phones the address bar shows / hides while scrolling and changes the height a little:
+    // ignore those small changes so the page does not jump.
+    if (!force && Math.abs(vw - state.vw) < 40 && Math.abs(vh - state.vh) < 140) return;
+    state.vh = vh;
+    state.vw = vw;
     state.pin = state.vh < 1300;
     applyLayout();
     dirty = true;
@@ -484,7 +488,7 @@
   var rsT;
   window.addEventListener('resize', function () { clearTimeout(rsT); rsT = setTimeout(function () { measure(); onScroll(); }, 140); });
   window.addEventListener('scroll', onScroll, { passive: true });
-  measure();
+  measure(true);
   requestAnimationFrame(tick);
   setTimeout(onScroll, 120);
 })();
